@@ -114,7 +114,6 @@ Artinya, jenis langganan tidak memiliki perbedaan besar dalam menentukan tingkat
 **Analisis:**
 - Distribusi frekuensi penggunaan layanan cukup merata, dengan mayoritas pelanggan memiliki penggunaan layanan yang konsisten.
 - Pelanggan dengan frekuensi penggunaan yang lebih rendah mungkin berisiko churn jika dibandingkan dengan pelanggan dengan frekuensi tinggi (perlu analisis tambahan untuk memastikan).
----
 
 ## Data Preparation
 Pada bagian ini Anda menerapkan dan menyebutkan teknik data preparation yang dilakukan. Teknik yang digunakan pada notebook dan laporan harus berurutan.
@@ -201,17 +200,23 @@ Pada tahap evaluation, percobaan modelling untuk customer churn prediction mengg
 **1. Accuracy**
 
 Akurasi mengukur proporsi prediksi yang benar dibandingkan dengan keseluruhan prediksi.Akurasi memberikan gambaran umum kinerja model, tetapi dapat menyesatkan jika dataset tidak seimbang.
-**formula:** ![Akurasi](https://i.postimg.cc/3NR0M9R5/pasted-image-0.png)
+
+**formula:** 
+
+![Akurasi](https://i.postimg.cc/3NR0M9R5/pasted-image-0.png)
 
 **2. Precision**
 
 Precision mengukur proporsi prediksi positif yang benar terhadap semua prediksi positif. Precision penting dalam kasus di mana False Positives (FP) harus diminimalkan, misalnya ketika salah memprediksi pelanggan churn dapat berdampak negatif pada strategi bisnis.
+
 **formula:**
 
 ![Precision](https://i.postimg.cc/QN4WgL4X/pasted-image-0-1.png)
+
 **3. Recall**
 
 Recall mengukur proporsi prediksi positif yang benar terhadap semua kasus sebenarnya positif. Recall penting ketika False Negatives (FN) harus diminimalkan, misalnya ketika perusahaan ingin memastikan semua pelanggan churn terdeteksi.
+
 **formula:**
 
 ![Recall](https://i.postimg.cc/RhD6vf63/pasted-image-0-2.png)
@@ -219,7 +224,10 @@ Recall mengukur proporsi prediksi positif yang benar terhadap semua kasus sebena
 **4. F1-Score**
 
 F1-Score adalah rata-rata harmonis antara precision dan recall, memberikan keseimbangan antara keduanya.F1-Score berguna ketika penting untuk menemukan keseimbangan antara precision dan recall.
-**formula:**![F1-Score](https://i.postimg.cc/PxKvF0dQ/pasted-image-0-3.png)
+
+**formula:**
+
+![F1-Score](https://i.postimg.cc/PxKvF0dQ/pasted-image-0-3.png)
 ---
 **Analisis Hasil:**
 
