@@ -147,29 +147,78 @@ Dataset Skor Pengguna memungkinkan berbagai analisis dan wawasan tentang interak
 ## Data Preparation
 **1. Checking dan Menghapus Data Null dan Duplicate**
 
-![Data Null](https://i.postimg.cc/RhFkmz9C/Screenshot-2024-11-28-103249.png)
+![image](https://github.com/user-attachments/assets/f2057c4b-d9af-4290-acf0-40c8718b251e)
+
 - Dari proses checking NULL dan Duplicate dari kedua dataset didapatkan hasil bahwa dataset skor pengguna memiliki 232 data NULL pada fitur username sehingga harus dihapus untuk mencegah kegagalan pada proses EDA dan modeling menggunakan code df_scores.dropna(inplace=True). Selain itu hasil dari cek duplicate untuk kedua dataset hasilnya nihil tidak ada value duplicate.
 
-**2. Merubah Tipe Data **
+**2. Merubah Tipe Data**
 
-![Drop Customerl](https://i.postimg.cc/TPvvDSjQ/Screenshot-2024-11-28-102952.png)
-- Pada dataset 
+![image](https://github.com/user-attachments/assets/e0857dc2-c100-4de6-a885-e68ae0740b71)
+![image](https://github.com/user-attachments/assets/02b0b815-b29e-4f66-9ab4-76b214f13b81)
 
-**3. Label Encoding**
+- Pada dataset anime terdapat fitur yang tidak seusai tipe datanya yaitu tipe data object pada fitur score dan rank sehingga perlu diatasi dengan merubah tipe datanya menjadi float. Selain dari kedua fitur juga memiliki nilai UNKNOWN yang perlu dihilangkan dan diganti, untuk pengganti nilai tersebut solusinya adalah menggunakan nilai mean dari kedua fitur.
 
-![Data Mapping](https://i.postimg.cc/W33VNZwP/Screenshot-2024-11-28-103653.png)
-![Label Encoding](https://i.postimg.cc/Jn2LGhpH/Screenshot-2024-11-28-103710.png)
-- Gambar pertama melakukan cek kolom yang mempunyai tipe data object untuk memahami kolom mana yang perlu diproses lebih lanjut, karena algoritma machine learning hanya dapat menangani data numerik. Kemudian mapping kolom Gender karena memiliki 2 kategori Female: 0 dan Male: 1.
-- Selanjutnya one hot encoding adalah metode yang merubah setiap nilai di dalam kolom menjadi kolom baru dan mengisinya dengan nilai biner dan cocok untuk banyak kategori. Dilihat pada gambar 2 salah satu kolom yaitu Subscription Type merubah isi kategori premium , basic, dan standard menjadi biner kemudian terbentuk kolom baru.
+**3. Normalisasi Data**
 
-**4. Splitting Data Train dan Data Test**
-- Membuat variabel baru untuk persiapan training model seperti X untuk menampung semua fitur numerikal untuk ditraining dan y untuk menampung fitur target klasifikasi. Kemudian membagi data menjadi data train dan testing dengan rasio 80:20,  data train: 80% dan data test: 20% dengan menggunakan library sklearn.
+![image](https://github.com/user-attachments/assets/129e4a18-8cf9-448c-93cc-5082761137e4)
 
-**5. Standarisasi Data**
-- Melakukan standardisasi data pada data train dan data test. Tahap terakhir yaitu melakukan standarisasi data. Hal ini dilakukan untuk membuat semua fitur berada dalam skala data yang sama yaitu dengan range 0-1. Strandadisasi data ini menggunakan fungsi StandardScaler.
+- Sebelum normalisasi data pada object modelling penulis membuat salinan subset dari dataframe df_scores untuk mengambil fitur 'user_id', 'anime_id', dan 'rating'. Kemudian melakukan normalisasi pada kolom rating menggunakan MinMaxScaler, sehingga nilai skor berada dalam rentang 0 hingga 1, lalu menyimpan hasil normalisasi dalam kolom baru bernama scaled_score. Proses ini penting dalam sistem rekomendasi karena algoritma tertentu bekerja lebih baik dengan data yang ter-normalisasi.
+
+**4. Fitur Encoding**
+
+![image](https://github.com/user-attachments/assets/92b4d609-560b-4c32-b951-f0b5ebbe804f)
+
+- Proses encoding ini merupakan langkah pra-pemrosesan penting dalam membangun sistem rekomendasi berbasis *Collaborative Filtering*, di mana ID User dan ID Anime perlu dikonversi menjadi angka agar dapat digunakan dalam deep learning.
+
+**5. Vektorization With TFIDF**
+ TF-IDF Vectorizer untuk mengubah data teks pada kolom Genres menjadi representasi numerik. Dalam konteks Content-Based Filtering, TF-IDF berperan penting sebagai teknik untuk menghitung bobot fitur dalam data teks yang akan digunakan untuk mengukur kesamaan antar item (dalam hal ini, anime). Dengan matriks TF-IDF ini, Content-Based Filtering dapat membandingkan kemiripan antar anime berdasarkan genre menggunakan teknik seperti Cosine Similarity.
+
+**6. Splitting Data Train dan Data Test**
+- Membuat variabel baru untuk persiapan training model seperti X untuk menampung semua fitur numerikal untuk ditraining dan y untuk menampung fitur target yaitu rating. Kemudian membagi data menjadi data train dan testing yang dimana panjang data train sebesar 24314959 dan testing sebesar 10000 dengan random state 73. Data splitting ini menggunakan library sklearn untuk membagi data train dan testing.
 
 
+## Modelling
+Pada bagian ini, menjelaskan dua metode yang digunakan untuk menyelesaikan permasalahan rekomendasi sistem anime 2023 yaitu *Collaborative Filtering* dan *Content Based Filtering*. Proses modelling dilakukan melalui tahapan sebagai berikut:
+
+### **A. Collaborative Filtering**
+Collaborative Filtering dengan pendekatan Deep Neural Network (DNN) adalah metode rekomendasi yang mempelajari interaksi antara pengguna dan item melalui representasi vektor laten menggunakan neural network. Dalam metode ini, sistem tidak bergantung pada atribut eksplisit dari item, melainkan menggunakan data interaksi antara pengguna dan item seperti peringkat atau skor untuk mempelajari pola tersembunyi. Neural network dalam pendekatan ini memanfaatkan embedding layer untuk merepresentasikan pengguna dan item ke dalam bentuk vektor berdimensi rendah, kemudian memodelkan hubungan non-linear antara keduanya melalui lapisan dense (Dense Layers). Pendekatan ini memungkinkan model untuk menangkap hubungan kompleks dalam data yang tidak dapat dijangkau oleh teknik kolaboratif sederhana seperti Matrix Factorization.
+
+Dalam implementasi sistem rekomendasi ini, parameter atau fitur utama yang digunakan adalah ID pengguna (user_id) dan ID anime (anime_id), yang diubah menjadi representasi numerik menggunakan Label Encoding. Kolom rating atau skor dari interaksi pengguna dengan anime kemudian dinormalisasi menggunakan MinMaxScaler agar nilainya berada dalam rentang 0 hingga 1. Data hasil encoding ini dibagi menjadi dua variabel utama: X sebagai input (berisi user_encoded dan anime_encoded) dan y sebagai target (berisi skor rating yang sudah dinormalisasi). Model DNN yang digunakan memiliki embedding layer untuk merepresentasikan pengguna dan item, kemudian menggabungkan kedua embedding tersebut melalui dot product untuk mengukur kecocokan antara pengguna dan anime. Lapisan tambahan berupa Dense Layer dengan aktivasi ReLU digunakan untuk menangkap hubungan non-linear, dan lapisan output dengan aktivasi sigmoid digunakan untuk memprediksi skor kecocokan dalam skala probabilitas.
+
+Proses pelatihan model menggunakan learning rate scheduler untuk menyesuaikan laju pembelajaran secara dinamis, early stopping untuk mencegah overfitting, dan Model Checkpoint untuk menyimpan bobot model terbaik selama pelatihan. Dengan parameter seperti jumlah epoch (20), ukuran batch (10.000), dan learning rate awal (0.00001), sistem ini dioptimalkan untuk mempelajari pola interaksi yang kompleks antara pengguna dan anime, sehingga mampu memberikan rekomendasi yang lebih akurat dan personal.
+
+**Kelebihan Metode:**
+- DNN dapat mempelajari hubungan non-linear antara pengguna dan item melalui penggunaan Dense Layers, sehingga memberikan rekomendasi yang lebih akurat dibanding metode kolaboratif sederhana seperti Matrix Factorization.
+- Dengan penggunaan embedding layer, model dapat merepresentasikan pengguna dan item dalam ruang vektor laten yang dapat belajar dari data interaksi yang kompleks.
+- Metode ini hanya memerlukan data interaksi pengguna-item (rating), sehingga dapat digunakan meskipun fitur eksplisit item seperti genre atau deskripsi tidak tersedia.
+
+**Kekurangan Metode:**
+- Metode ini tidak dapat memberikan rekomendasi akurat bagi pengguna atau item baru yang belum memiliki cukup interaksi.
+- Pelatihan model DNN memerlukan daya komputasi yang besar, terutama pada dataset dengan jumlah pengguna dan item yang besar.
+- Jika tidak diatur dengan baik (misalnya dengan early stopping atau regularization), model berpotensi overfitting pada data pelatihan.
+
+Berikut hasil rekomendasi metode Collaborative Filtering dengan DNN:
+![image](https://github.com/user-attachments/assets/3dc4f903-fe2a-4b70-ab4d-8b564f1a4f37)
 
 
+### **B. Content Based Filtering**
 
+Content-Based Filtering adalah salah satu metode dalam sistem rekomendasi yang bekerja dengan menganalisis karakteristik atau fitur dari item yang akan direkomendasikan dan membandingkannya dengan preferensi pengguna atau item yang pernah dipilih sebelumnya. Pendekatan Cosine Similarity dalam metode ini digunakan untuk mengukur sejauh mana dua item serupa satu sama lain berdasarkan fitur yang dimiliki. Cosine Similarity menghitung kesamaan antara dua vektor dengan melihat sudut di antara mereka; semakin kecil sudut yang terbentuk, semakin tinggi nilai kesamaan kedua vektor tersebut. Dalam sistem ini, fitur yang dipakai untuk membandingkan antar-item adalah genre dari anime.
+
+Untuk membangun sistem rekomendasi ini, dilakukan transformasi teks dari kolom "Genres" menjadi representasi numerik menggunakan TF-IDF (Term Frequency-Inverse Document Frequency). Teknik ini memberikan bobot pada setiap kata yang ada dalam kolom genre berdasarkan frekuensi kemunculannya di satu item relatif terhadap keseluruhan dataset. Kata yang sering muncul dalam satu genre tetapi jarang di genre lain akan mendapatkan bobot yang lebih tinggi, sehingga menjadi lebih informatif. Hasil transformasi ini berupa TF-IDF matrix, di mana setiap baris mewakili anime dan setiap kolom mewakili istilah unik dari genre.
+
+Setelah matrix TF-IDF terbentuk, nilai Cosine Similarity dihitung untuk mencari tingkat kemiripan antara satu anime dengan anime lainnya. Nilai kemiripan ini digunakan sebagai dasar untuk merekomendasikan anime dengan genre yang paling mirip. Dalam implementasi sistem, tidak hanya kemiripan genre yang menjadi acuan, tetapi juga parameter tambahan berupa rating atau skor anime. Skor ini digunakan sebagai filter untuk memastikan bahwa rekomendasi yang diberikan memiliki kualitas yang baik dan relevan bagi pengguna. Dengan demikian, sistem ini mampu merekomendasikan anime berdasarkan kesamaan konten yang diukur melalui Cosine Similarity sambil mempertimbangkan kualitas item melalui skor yang valid.
+
+**Kelebihan Metode:**
+- Tidak memerlukan data preferensi pengguna lain (seperti dalam Collaborative Filtering).
+- Jika sebuah anime baru ditambahkan, sistem masih bisa merekomendasikan berdasarkan atribut kontennya (genre).
+- Mudah dipahami karena rekomendasi dibuat berdasarkan kesamaan fitur yang dapat dilihat langsung
+
+**Kekurangan Metode:**
+- Jika pengguna belum memiliki riwayat interaksi, sistem tidak dapat memberikan rekomendasi personal.
+- Sistem hanya merekomendasikan anime dengan genre yang mirip, sehingga pengguna jarang diperkenalkan ke konten yang berbeda atau baru.
+- Sistem ini hanya mengandalkan atribut eksplisit (genre) dan tidak mempertimbangkan pola preferensi yang lebih kompleks seperti perilaku pengguna.
+
+Berikut hasil rekomendasi Content Based Filtering dengan Cosine Similarity:
+![image](https://github.com/user-attachments/assets/11191ed7-55aa-4c4f-8116-e4fa4bbbff03)
 
